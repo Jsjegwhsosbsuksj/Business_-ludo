@@ -1,0 +1,562 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BUSINESS LUDO</title>
+
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:Segoe UI,Arial,sans-serif}
+body{
+background:#f4f7fb;
+color:#222;
+}
+
+header{
+background:#1e3a8a;
+color:white;
+padding:18px;
+text-align:center;
+font-size:30px;
+font-weight:bold;
+letter-spacing:2px;
+}
+
+.page{display:none;padding:30px;animation:fade .4s}
+.active{display:block}
+@keyframes fade{from{opacity:0;transform:translateY(8px)}to{opacity:1}}
+
+.cards{
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+gap:25px;
+margin-top:40px;
+}
+
+.card{
+background:white;
+padding:35px;
+border-radius:18px;
+text-align:center;
+cursor:pointer;
+box-shadow:0 10px 25px rgba(0,0,0,.1);
+transition:.3s;
+font-size:22px;
+font-weight:700;
+}
+
+.card:hover{transform:translateY(-6px)}
+
+.club-grid{
+display:grid;
+grid-template-columns:repeat(2,1fr);
+gap:20px;
+max-width:700px;
+margin:40px auto;
+}
+
+.club-btn{
+padding:35px;
+font-size:26px;
+border:none;
+border-radius:18px;
+color:#fff;
+cursor:pointer;
+font-weight:bold;
+}
+
+.hr{background:#2563eb}
+.marketing{background:#ec4899}
+.finance{background:#16a34a}
+.operations{background:#ea580c}
+
+.next, .finish, .loginBtn, .back{
+margin-top:30px;
+padding:14px 30px;
+border:none;
+border-radius:10px;
+cursor:pointer;
+font-size:18px;
+color:#fff;
+background:#1e40af;
+}
+
+.finish{background:#16a34a}
+.back{background:#64748b}
+textarea{
+width:100%;
+height:220px;
+padding:15px;
+font-size:16px;
+border-radius:12px;
+border:1px solid #ccc;
+resize:none;
+}
+
+table{
+width:100%;
+border-collapse:collapse;
+margin-top:20px;
+}
+
+th,td{
+border:1px solid #ccc;
+padding:12px;
+text-align:center;
+}
+
+th{background:#1e40af;color:white}
+
+input[type=password]{
+padding:12px;
+width:280px;
+font-size:18px;
+border-radius:8px;
+border:1px solid #bbb;
+}
+
+.answerCard{
+background:white;
+padding:18px;
+border-radius:14px;
+margin-bottom:18px;
+box-shadow:0 6px 18px rgba(0,0,0,.08)
+}
+
+.answerCard button{
+margin-right:8px;
+margin-top:10px;
+padding:8px 14px;
+border:none;
+border-radius:8px;
+cursor:pointer;
+color:white
+}
+
+.view{background:#2563eb}
+.correct{background:#16a34a}
+.wrong{background:#dc2626}
+
+.boardWrap{
+display:grid;
+grid-template-columns:260px auto;
+gap:25px;
+align-items:start;
+}
+
+.score{
+background:white;
+padding:15px;
+border-radius:14px;
+box-shadow:0 6px 18px rgba(0,0,0,.08)
+}
+
+.team{
+padding:10px;
+border-radius:10px;
+margin-bottom:10px;
+color:white;
+font-weight:bold;
+}
+
+.team small{display:block;font-weight:400}
+
+.boardContainer{
+position:relative;
+width:750px;
+height:750px;
+}
+
+#board{
+display:grid;
+grid-template-columns:repeat(15,1fr);
+grid-template-rows:repeat(15,1fr);
+width:750px;
+height:750px;
+border:3px solid #333;
+background:white;
+}
+
+.cell{
+border:1px solid #ddd;
+display:flex;
+align-items:center;
+justify-content:center;
+font-size:10px;
+}
+
+.token{
+position:absolute;
+width:24px;
+height:24px;
+border-radius:50%;
+transition:all .6s ease;
+border:2px solid #fff;
+box-shadow:0 2px 6px rgba(0,0,0,.3);
+z-index:5;
+}
+
+.blue{background:#2563eb}
+.pink{background:#ec4899}
+.green{background:#16a34a}
+.orange{background:#ea580c}
+
+.homeBtn{
+position:fixed;
+right:20px;
+bottom:20px;
+background:#111827;
+color:white;
+padding:12px 18px;
+border-radius:50px;
+cursor:pointer;
+}
+</style>
+</head>
+<body>
+
+<header>🎲 BUSINESS LUDO</header>
+
+<!-- HOME -->
+<section id="home" class="page active">
+<h2 align="center">Business Analytics Inter Club Event</h2>
+
+<div class="cards">
+<div class="card" onclick="show('adminLogin')">🔐 Admin Login</div>
+<div class="card" onclick="show('clubLogin')">👥 Club Login</div>
+<div class="card" onclick="openBoard()">🎯 Public Ludo Board</div>
+</div>
+</section>
+
+<!-- CLUB LOGIN -->
+<section id="clubLogin" class="page">
+<h2 align="center">Select Your Club</h2>
+
+<div class="club-grid">
+<button class="club-btn hr" onclick="selectClub('HR')">HR</button>
+<button class="club-btn marketing" onclick="selectClub('Marketing')">Marketing</button>
+<button class="club-btn finance" onclick="selectClub('Finance')">Finance</button>
+<button class="club-btn operations" onclick="selectClub('Operations')">Operations</button>
+</div>
+
+<button class="back" onclick="show('home')">Back</button>
+</section>
+
+<!-- TEAM PAGE -->
+<section id="team" class="page">
+
+<div id="step1">
+<h1 id="clubTitle"></h1><br>
+
+<p><b>Case:</b> Infosys has observed a 12% variation in recruitment analytics over the last 24 months. Management has appointed a Business Analytics team consisting of a Business Analyst, Data Scientist and Data Engineer to identify patterns from operational data and recommend strategies that improve productivity, profitability and customer or employee satisfaction within six months. Historical data from ERP, CRM, HRMS and SQL databases is available for analysis.</p>
+
+<button class="next" onclick="nextStep(2)">Next</button>
+</div>
+
+<div id="step2" style="display:none">
+<h1>Business Analytics Dataset</h1>
+
+<table>
+<tr><th>Variable</th><th>Sample</th><th>Description</th></tr>
+<tr><td>Month</td><td>24</td><td>Historical period</td></tr>
+<tr><td>Records</td><td>189392</td><td>Transactions</td></tr>
+<tr><td>KPI</td><td>89%</td><td>Current performance</td></tr>
+<tr><td>Target</td><td>7%</td><td>Improvement goal</td></tr>
+<tr><td>Satisfaction</td><td>87</td><td>Survey score</td></tr>
+</table>
+
+<button class="next" onclick="nextStep(3)">Next</button>
+</div>
+
+<div id="step3" style="display:none">
+<h2>Q1.</h2>
+<p>As a Business Analyst, identify the business problem, classify the variables, define KPIs and explain which analytics technique should be used.</p>
+
+<br>
+
+<h2>Q2.</h2>
+<p>As a Data Scientist and Data Engineer, design the data pipeline, dashboard and predictive model to achieve the business target.</p>
+
+<button class="next" onclick="nextStep(4)">Next</button>
+</div>
+
+<div id="step4" style="display:none">
+<h1>Submit Your Answer</h1><br>
+
+<textarea id="answer" placeholder="Write your complete business analysis here..."></textarea>
+
+<button class="finish" onclick="submitAnswer()">Finish</button>
+</div>
+
+</section>
+
+<!-- ADMIN LOGIN -->
+<section id="adminLogin" class="page">
+<h2>Admin Login</h2><br>
+
+<input type="password" id="adminPass" placeholder="Enter Password">
+<br>
+<button class="loginBtn" onclick="adminLogin()">Login</button>
+
+<button class="back" onclick="show('home')">Back</button>
+</section>
+
+<!-- ADMIN DASHBOARD -->
+<section id="admin" class="page">
+<h2>Pending Answers</h2><br>
+
+<div id="answerList"></div>
+
+<button class="back" onclick="show('home')">Home</button>
+</section>
+
+<!-- BOARD -->
+<section id="boardPage" class="page">
+<h2>Public Ludo Board</h2><br>
+
+<div class="boardWrap">
+
+<div class="score" id="scoreboard"></div>
+
+<div class="boardContainer">
+<div id="board"></div>
+
+<div id="hrToken" class="token blue"></div>
+<div id="mkToken" class="token pink"></div>
+<div id="fnToken" class="token green"></div>
+<div id="opToken" class="token orange"></div>
+
+</div>
+</div>
+
+<button class="back" onclick="show('home')">Home</button>
+</section>
+
+<div class="homeBtn" onclick="show('home')">🏠 Home</div>
+
+<script>
+const pages=document.querySelectorAll(".page");
+
+function show(id){
+pages.forEach(p=>p.classList.remove("active"));
+document.getElementById(id).classList.add("active");
+if(id==="boardPage") renderBoard();
+if(id==="admin") loadAnswers();
+}
+
+let currentClub="";
+
+function selectClub(club){
+currentClub=club;
+localStorage.setItem("selectedClub",club);
+document.getElementById("clubTitle").innerText="Welcome "+club+" Team";
+show("team");
+nextStep(1);
+}
+
+function nextStep(n){
+for(let i=1;i<=4;i++)
+document.getElementById("step"+i).style.display="none";
+document.getElementById("step"+n).style.display="block";
+}
+
+function submitAnswer(){
+
+const txt=document.getElementById("answer").value.trim();
+
+if(!txt){
+alert("Please write your answer.");
+return;
+}
+
+const arr=JSON.parse(localStorage.getItem("answers")||"[]");
+
+arr.push({
+club:currentClub,
+caseId:1,
+answer:txt,
+status:"Pending",
+time:new Date().toLocaleTimeString()
+});
+
+localStorage.setItem("answers",JSON.stringify(arr));
+
+document.getElementById("answer").value="";
+alert("Answer Submitted Successfully");
+
+show("home");
+}
+
+function adminLogin(){
+
+if(document.getElementById("adminPass").value==="admin123"){
+show("admin");
+}else{
+alert("Wrong Password");
+}
+
+}
+
+function loadAnswers(){
+
+const list=document.getElementById("answerList");
+const arr=JSON.parse(localStorage.getItem("answers")||"[]");
+
+list.innerHTML="";
+
+if(arr.length===0){
+list.innerHTML="<p>No submissions yet.</p>";
+return;
+}
+
+arr.forEach((a,i)=>{
+
+const card=document.createElement("div");
+card.className="answerCard";
+
+card.innerHTML=`
+<h3>${a.club} — Case Study 1</h3>
+<p>Status: <b>${a.status}</b></p>
+<p>Submitted Time: ${a.time}</p>
+
+<div id="ans${i}" style="display:none;margin-top:10px;background:#f3f4f6;padding:10px;border-radius:8px;white-space:pre-wrap">${a.answer}</div>
+
+<button class="view" onclick="toggleAnswer(${i})">View Answer</button>
+<button class="correct" onclick="mark(${i},'Approved')">Correct</button>
+<button class="wrong" onclick="mark(${i},'Rejected')">Wrong</button>
+`;
+
+list.appendChild(card);
+
+});
+
+}
+
+function toggleAnswer(i){
+const el=document.getElementById("ans"+i);
+el.style.display=el.style.display==="none"?"block":"none";
+}
+
+function mark(index,status){
+
+let arr=JSON.parse(localStorage.getItem("answers"));
+
+if(arr[index].status!=="Pending") return;
+
+arr[index].status=status;
+localStorage.setItem("answers",JSON.stringify(arr));
+
+if(status==="Approved"){
+let prog=JSON.parse(localStorage.getItem("progress")||'{"HR":1,"Marketing":1,"Finance":1,"Operations":1}');
+prog[arr[index].club]++;
+localStorage.setItem("progress",JSON.stringify(prog));
+}
+
+loadAnswers();
+renderBoard();
+
+}
+
+const board=document.getElementById("board");
+const size=15;
+let cells=[];
+
+function createBoard(){
+
+board.innerHTML="";
+cells=[];
+
+for(let r=0;r<size;r++){
+
+if(r%2===0){
+for(let c=0;c<size;c++) cells.push([r,c]);
+}else{
+for(let c=size-1;c>=0;c--) cells.push([r,c]);
+}
+
+}
+
+for(let r=0;r<size;r++){
+for(let c=0;c<size;c++){
+
+const d=document.createElement("div");
+d.className="cell";
+d.id="cell-"+r+"-"+c;
+
+const idx=cells.findIndex(x=>x[0]==r&&x[1]==c)+1;
+d.innerText=idx;
+
+board.appendChild(d);
+
+}
+}
+
+}
+
+createBoard();
+
+function renderBoard(){
+
+let prog=JSON.parse(localStorage.getItem("progress")||'{"HR":1,"Marketing":1,"Finance":1,"Operations":1}');
+
+moveToken("hrToken",prog.HR);
+moveToken("mkToken",prog.Marketing);
+moveToken("fnToken",prog.Finance);
+moveToken("opToken",prog.Operations);
+
+const sb=document.getElementById("scoreboard");
+
+sb.innerHTML="";
+
+[
+["HR","#2563eb",prog.HR],
+["Marketing","#ec4899",prog.Marketing],
+["Finance","#16a34a",prog.Finance],
+["Operations","#ea580c",prog.Operations]
+].forEach(t=>{
+
+const div=document.createElement("div");
+
+div.className="team";
+div.style.background=t[1];
+
+div.innerHTML=`
+${t[0]}
+<small>Progress : Cell ${t[2]}</small>
+<small>Score : ${(t[2]-1)*10}</small>
+<small>Staff Coin : ${t[2]-1}</small>
+<small>AI Coin : ${(t[2]-1)*2}</small>
+`;
+
+sb.appendChild(div);
+
+});
+
+}
+
+function moveToken(id,cellNo){
+
+const token=document.getElementById(id);
+
+const pos=cells[Math.max(0,cellNo-1)];
+
+const cell=document.getElementById(`cell-${pos[0]}-${pos[1]}`);
+
+const rect=cell.getBoundingClientRect();
+const parent=document.querySelector(".boardContainer").getBoundingClientRect();
+
+token.style.left=(rect.left-parent.left+13)+"px";
+token.style.top=(rect.top-parent.top+13)+"px";
+
+}
+
+function openBoard(){
+show("boardPage");
+setTimeout(renderBoard,100);
+}
+
+window.onload=renderBoard;
+</script>
+
+</body>
+</html>
